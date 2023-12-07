@@ -3,23 +3,6 @@ import pandas as pd
 import seaborn as sns
 from tqdm import tqdm
 
-df = pd.read_csv("data/data_final.csv")
-# print(df.columns)
-
-"""
-Index(['Unnamed: 0', 'Year_Birth', 'Education', 'ages', 'Marital_Status',
-       'Graduation', 'Master', '2n Cycle', 'Basic', 'PhD', 'Income', 'single',
-       'married', 'Kidhome', 'Teenhome', 'Dt_Customer', 'Recency', 'MntWines',
-       'months', 'MntFruits', 'MntMeatProducts', 'MntFishProducts',
-       'MntSweetProducts', 'MntGoldProds', 'NumDealsPurchases',
-       'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases',
-       'NumWebVisitsMonth', 'AcceptedCmp3', 'AcceptedCmp4', 'AcceptedCmp5',
-       'AcceptedCmp1', 'AcceptedCmp2', 'Complain', 'Z_CostContact',
-       'Z_Revenue', 'Response', 'Total_Spent', 'Total_Spent_Per_Month',
-       'TotalChildren', 'HasChildren'],
-      dtype='object')
-"""
-
 
 def plot_hist(columns):
     def smallest_square_number(n):
@@ -43,12 +26,29 @@ def pair_plot(columns):
 
 def heatmap(columns):
     correlation_matrix = df[columns].corr()
-    fig = plt.figure(figsize=(8, 8))
+    fig = plt.figure(figsize=(14, 14))
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
     plt.savefig("img/heatmap.png")
 
 
 if __name__ == "__main__":
+    df = pd.read_csv("data/marketing_data_preprocess.csv")
+    # print(df.columns)
+
+    """
+    Index(['Unnamed: 0', 'Year_Birth', 'Education', 'ages', 'Marital_Status',
+       'Graduation', 'PhD', 'Basic', '2n Cycle', 'Master', 'Income', 'single',
+       'married', 'Kidhome', 'Teenhome', 'Dt_Customer', 'Recency', 'MntWines',
+       'months', 'MntFruits', 'MntMeatProducts', 'MntFishProducts',
+       'MntSweetProducts', 'MntGoldProds', 'NumDealsPurchases',
+       'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases',
+       'NumWebVisitsMonth', 'AcceptedCmp3', 'AcceptedCmp4', 'AcceptedCmp5',
+       'AcceptedCmp1', 'AcceptedCmp2', 'Complain', 'Z_CostContact',
+       'Z_Revenue', 'Response', 'Total_Spent', 'Total_Spent_Per_Month',
+       'Childbin', 'Kidbin', 'Teenbin', 'NwpPerVM', 'NwpPerV', 'NumPurchases',
+       'WebRatio'],
+      dtype='object')
+    """
     selected_columns = [
         "ages", 
         "Education", 
@@ -66,6 +66,12 @@ if __name__ == "__main__":
         "NumCatalogPurchases",
         "NumStorePurchases",
         "NumWebVisitsMonth",
+        "NwpPerV",
+        "Total_Spent", 
+        "Total_Spent_Per_Month", 
+        "Childbin", 
+        "Kidbin", 
+        "Teenbin",
         "WebRatio"
     ]
 
@@ -85,6 +91,12 @@ if __name__ == "__main__":
         "NumCatalogPurchases",
         "NumStorePurchases",
         "NumWebVisitsMonth",
+        "NwpPerV",
+        "Total_Spent", 
+        "Total_Spent_Per_Month", 
+        "Childbin", 
+        "Kidbin", 
+        "Teenbin",
         "WebRatio"
     ]
     
