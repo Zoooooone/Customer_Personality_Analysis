@@ -84,4 +84,24 @@ df = df[df["Income"] < 500000]
 # drop nan
 df = df.dropna()
 
+# most purchased category from website
+purchases = df[["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]]
+df["most_purchased"] = purchases.idxmax(axis=1)
+
+
+def rename_category(column_name):
+    column_name_to_category = {
+        "MntWines": "wine", 
+        "MntFruits": "fruits", 
+        "MntMeatProducts": "meat",
+        "MntFishProducts": "fish",
+        "MntSweetProducts": "sweet",
+        "MntGoldProds": "gold"
+    }
+    return column_name_to_category[column_name]
+
+
+df["most_purchased"] = df["most_purchased"].apply(rename_category)
+
+# save the dataframe
 df.to_csv("data/marketing_data_preprocess.csv")
