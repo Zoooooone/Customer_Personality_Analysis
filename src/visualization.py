@@ -70,8 +70,9 @@ def plot_web_purchase_over_median_pie():
     categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
     purchase = df[df["WebRatio"] >= df["WebRatio"].describe().at["50%"]][categories]
     purchase_sum = dict()
-    for column in purchase.columns:
+    for column in categories:
         purchase_sum[column_name_to_category[column]] = purchase[column].sum()
+    purchase_sum = Counter(purchase_sum)
     labels, counts = zip(*purchase_sum.items())
 
     fig1 = plt.figure(figsize=(8, 6))
@@ -95,8 +96,9 @@ def plot_web_purchase_under_median_pie():
     categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
     purchase = df[df["WebRatio"] < df["WebRatio"].describe().at["50%"]][categories]
     purchase_sum = dict()
-    for column in purchase.columns:
+    for column in categories:
         purchase_sum[column_name_to_category[column]] = purchase[column].sum()
+    purchase_sum = Counter(purchase_sum)
     labels, counts = zip(*purchase_sum.items())
 
     fig1 = plt.figure(figsize=(8, 6))
@@ -120,8 +122,9 @@ def plot_web_purchase_pie():
     categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
     purchase = df[categories]
     purchase_sum = dict()
-    for column in purchase.columns:
+    for column in categories:
         purchase_sum[column_name_to_category[column]] = purchase[column].sum()
+    purchase_sum = Counter(purchase_sum)
     labels, counts = zip(*purchase_sum.items())
 
     fig1 = plt.figure(figsize=(8, 6))
@@ -145,8 +148,9 @@ def plot_web_purchase_over_median_bar():
     categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
     purchase = df[df["WebRatio"] >= df["WebRatio"].describe().at["50%"]][categories]
     purchase_sum = dict()
-    for column in purchase.columns:
+    for column in categories:
         purchase_sum[column_name_to_category[column]] = purchase[column].sum()
+    purchase_sum = Counter(purchase_sum)
     labels, counts = zip(*purchase_sum.items())
 
     fig1 = plt.figure(figsize=(8, 6))
@@ -172,8 +176,9 @@ def plot_web_purchase_under_median_bar():
     categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
     purchase = df[df["WebRatio"] < df["WebRatio"].describe().at["50%"]][categories]
     purchase_sum = dict()
-    for column in purchase.columns:
+    for column in categories:
         purchase_sum[column_name_to_category[column]] = purchase[column].sum()
+    purchase_sum = dict(sorted(purchase_sum.items()))
     labels, counts = zip(*purchase_sum.items())
 
     fig1 = plt.figure(figsize=(8, 6))
@@ -199,8 +204,9 @@ def plot_web_purchase_bar():
     categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
     purchase = df[categories]
     purchase_sum = dict()
-    for column in purchase.columns:
+    for column in categories:
         purchase_sum[column_name_to_category[column]] = purchase[column].sum()
+    purchase_sum = Counter(purchase_sum)
     labels, counts = zip(*purchase_sum.items())
 
     fig1 = plt.figure(figsize=(8, 6))
