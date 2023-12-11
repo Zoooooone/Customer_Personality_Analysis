@@ -1,9 +1,14 @@
+import argparse
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from tqdm import tqdm
 from collections import Counter
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 column_name_to_category = {
     "MntWines": "wine", 
@@ -15,13 +20,38 @@ column_name_to_category = {
 }
 
 
-def plot_hist(columns):
+def plot_hist(df):
     def smallest_square_number(n):
         res = 1
         while res ** 2 < n:
             res += 1
         return res
 
+    columns = [
+        "ages", 
+        "Education", 
+        "Income", 
+        "months", 
+        "Recency", 
+        "MntWines", 
+        "MntFruits", 
+        "MntMeatProducts", 
+        "MntFishProducts", 
+        "MntSweetProducts",
+        "MntGoldProds",
+        "NumDealsPurchases",
+        "NumWebPurchases",
+        "NumCatalogPurchases",
+        "NumStorePurchases",
+        "NumWebVisitsMonth",
+        "NwpPerV",
+        "Total_Spent", 
+        "Total_Spent_Per_Month", 
+        "Childbin", 
+        "Kidbin", 
+        "Teenbin",
+        "WebRatio"
+    ]
     n = len(columns)
     row = smallest_square_number(n)
     fig, axes = plt.subplots(row, row, figsize=(25, 25))
@@ -30,12 +60,61 @@ def plot_hist(columns):
     plt.savefig("img/histogram.png")
 
 
-def pair_plot(columns):
+def pair_plot(df):
+    columns = [
+        "ages", 
+        "Education", 
+        "Income", 
+        "months", 
+        "Recency", 
+        "MntWines", 
+        "MntFruits", 
+        "MntMeatProducts", 
+        "MntFishProducts", 
+        "MntSweetProducts",
+        "MntGoldProds",
+        "NumDealsPurchases",
+        "NumWebPurchases",
+        "NumCatalogPurchases",
+        "NumStorePurchases",
+        "NumWebVisitsMonth",
+        "NwpPerV",
+        "Total_Spent", 
+        "Total_Spent_Per_Month", 
+        "Childbin", 
+        "Kidbin", 
+        "Teenbin",
+        "WebRatio"
+    ]
     sns.pairplot(df[columns])
     plt.savefig("img/pairplot.png")
 
 
-def heatmap(columns):
+def plot_heatmap(df):
+    columns = [
+        "ages",  
+        "Income", 
+        "months", 
+        "Recency", 
+        "MntWines", 
+        "MntFruits", 
+        "MntMeatProducts", 
+        "MntFishProducts", 
+        "MntSweetProducts",
+        "MntGoldProds",
+        "NumDealsPurchases",
+        "NumWebPurchases",
+        "NumCatalogPurchases",
+        "NumStorePurchases",
+        "NumWebVisitsMonth",
+        "NwpPerV",
+        "Total_Spent", 
+        "Total_Spent_Per_Month", 
+        "Childbin", 
+        "Kidbin", 
+        "Teenbin",
+        "WebRatio"
+    ]
     correlation_matrix = df[columns].corr()
     fig = plt.figure(figsize=(14, 14))
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
@@ -66,252 +145,116 @@ def plot_cls_res(metric):
     plt.savefig(f"results/{metric}.png")
 
 
-def plot_web_purchase_over_median_pie():
+def plot_web_purchase_over_median_pie(df, args):
     categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
-    purchase = df[df["WebRatio"] >= df["WebRatio"].describe().at["50%"]][categories]
+
+    if args.relation_with_median == "over":
+        purchase = df[df["WebRatio"] >= df["WebRatio"].describe().at["50%"]][categories]
+        categories_over_median = df[df["WebRatio"] >= df["WebRatio"].describe().at["50%"]]["most_purchased"]
+    elif args.relation_with_median == "under":
+        purchase = df[df["WebRatio"] < df["WebRatio"].describe().at["50%"]][categories]
+        categories_over_median = df[df["WebRatio"] < df["WebRatio"].describe().at["50%"]]["most_purchased"]
+    else:
+        purchase = df[categories]
+        categories_over_median = df["most_purchased"]
+
     purchase_sum = dict()
     for column in categories:
-        purchase_sum[column_name_to_category[column]] = purchase[column].sum()
-    purchase_sum = Counter(purchase_sum)
-    labels, counts = zip(*purchase_sum.items())
+        purchase_sum[column_name_to_category[column]] = sum(purchase[column])
 
-    fig1 = plt.figure(figsize=(8, 6))
-    plt.pie(counts, labels=None, autopct='%d%%', startangle=90, pctdistance=0.75, textprops={'fontsize': 12})
-    plt.legend(labels, loc="best")
-    plt.title("purchase (web ratio >= 50%)")
-    plt.savefig("results/web_purchase_over_median_pie.png")
-
-    categories_over_median = df[df["WebRatio"] >= df["WebRatio"].describe().at["50%"]]["most_purchased"]
     counter = Counter(categories_over_median)
-    labels, counts = zip(*counter.items())
+    purchase_sum = dict(sorted(purchase_sum.items(), key=lambda x: x[0]))
+    counter = dict(sorted(counter.items(), key=lambda x: x[0]))
 
-    fig2 = plt.figure(figsize=(8, 6), dpi=400)
-    plt.pie(counts, labels=None, autopct='%d%%', startangle=90, pctdistance=0.75, textprops={'fontsize': 12})
-    plt.legend(labels, loc="best")
-    plt.title("most purchased categories (web ratio >= 50%)")
-    plt.savefig("results/most_purchased_categories_over_median_pie.png")
+    graph = args.graph
 
+    def set_title(title):
+        if title == "amount of purchase":
+            if args.relation_with_median == "over":
+                plt.title("amount of purchase (web ratio >= 50%)")
+            elif args.relation_with_median == "under":
+                plt.title("amount of purchase (web ratio < 50%)")
+            else:
+                plt.title("amount of purchase")
+        else:
+            if args.relation_with_median == "over":
+                plt.title("most purchased category (web ratio >= 50%)")
+            elif args.relation_with_median == "under":
+                plt.title("most purchased category (web ratio < 50%)")
+            else:
+                plt.title("most purchased category")
 
-def plot_web_purchase_under_median_pie():
-    categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
-    purchase = df[df["WebRatio"] < df["WebRatio"].describe().at["50%"]][categories]
-    purchase_sum = dict()
-    for column in categories:
-        purchase_sum[column_name_to_category[column]] = purchase[column].sum()
-    purchase_sum = Counter(purchase_sum)
-    labels, counts = zip(*purchase_sum.items())
+    if graph == "pie":
+        labels, counts = zip(*purchase_sum.items())
+        logger.info(f"{' amount of purchase':<30}{str(labels):<60}{str(counts):<60}")
+        
+        fig1 = plt.figure(figsize=(10, 8))
+        plt.pie(counts, labels=None, autopct='%d%%', startangle=90, counterclock=False, pctdistance=0.8, textprops={'fontsize': 10})
+        plt.legend(labels, loc="best")
+        set_title("amount of purchase")
+        plt.savefig(f"results/{graph}/web_purchase_{args.relation_with_median}_median_{graph}.png")
 
-    fig1 = plt.figure(figsize=(8, 6))
-    plt.pie(counts, labels=None, autopct='%d%%', startangle=90, pctdistance=0.75, textprops={'fontsize': 12})
-    plt.legend(labels, loc="best")
-    plt.title("purchase (web ratio < 50%)")
-    plt.savefig("results/web_purchase_under_median_pie.png")
+        labels, counts = zip(*counter.items())
+        logger.info(f"{' most purchased category':<30}{str(labels):<60}{str(counts):<60}")
 
-    categories_over_median = df[df["WebRatio"] < df["WebRatio"].describe().at["50%"]]["most_purchased"]
-    counter = Counter(categories_over_median)
-    labels, counts = zip(*counter.items())
+        fig2 = plt.figure(figsize=(10, 8), dpi=400)
+        plt.pie(counts, labels=None, autopct='%d%%', startangle=90, counterclock=False, pctdistance=0.8, textprops={'fontsize': 10})
+        plt.legend(labels, loc="best")
+        set_title("most purchased category")
+        plt.savefig(f"results/{graph}/most_purchased_categories_{args.relation_with_median}_median_{graph}.png")
+    
+    else:
+        labels, counts = zip(*purchase_sum.items())
 
-    fig = plt.figure(figsize=(8, 6), dpi=400)
-    plt.pie(counts, labels=None, autopct='%d%%', startangle=90, pctdistance=0.85, textprops={'fontsize': 8})
-    plt.legend(labels, loc="best")
-    plt.title("most purchased categories (web ratio < 50%)")
-    plt.savefig("results/most_purchased_categories_under_median_pie.png")
+        fig1 = plt.figure(figsize=(10, 8))
+        plt.bar(labels, counts)
+        plt.xlabel("categories")
+        plt.ylabel("the sum of consumption")
+        set_title("amount of purchase")
+        plt.savefig(f"results/{graph}/web_purchase_{args.relation_with_median}_median_{graph}.png")
 
+        labels, counts = zip(*counter.items())
 
-def plot_web_purchase_pie():
-    categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
-    purchase = df[categories]
-    purchase_sum = dict()
-    for column in categories:
-        purchase_sum[column_name_to_category[column]] = purchase[column].sum()
-    purchase_sum = Counter(purchase_sum)
-    labels, counts = zip(*purchase_sum.items())
-
-    fig1 = plt.figure(figsize=(8, 6))
-    plt.pie(counts, labels=None, autopct='%d%%', startangle=90, pctdistance=0.75, textprops={'fontsize': 12})
-    plt.legend(labels, loc="best")
-    plt.title("purchase")
-    plt.savefig("results/web_purchase_pie.png")
-
-    categories_over_median = df["most_purchased"]
-    counter = Counter(categories_over_median)
-    labels, counts = zip(*counter.items())
-
-    fig = plt.figure(figsize=(8, 6), dpi=400)
-    plt.pie(counts, labels=None, autopct='%d%%', startangle=90, pctdistance=0.85, textprops={'fontsize': 8})
-    plt.legend(labels, loc="best")
-    plt.title("most purchased categories")
-    plt.savefig("results/most_purchased_categories_pie.png")
-
-
-def plot_web_purchase_over_median_bar():
-    categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
-    purchase = df[df["WebRatio"] >= df["WebRatio"].describe().at["50%"]][categories]
-    purchase_sum = dict()
-    for column in categories:
-        purchase_sum[column_name_to_category[column]] = purchase[column].sum()
-    purchase_sum = Counter(purchase_sum)
-    labels, counts = zip(*purchase_sum.items())
-
-    fig1 = plt.figure(figsize=(8, 6))
-    plt.bar(labels, counts)
-    plt.title("purchase (web ratio >= 50%)")
-    plt.xlabel("categories")
-    plt.ylabel("the sum of consumption")
-    plt.savefig("results/web_purchase_over_median_bar.png")
-
-    categories_over_median = df[df["WebRatio"] >= df["WebRatio"].describe().at["50%"]]["most_purchased"]
-    counter = Counter(categories_over_median)
-    labels, counts = zip(*counter.items())
-
-    fig2 = plt.figure(figsize=(8, 6))
-    plt.bar(labels, counts)
-    plt.title("most purchased categories (web ratio >= 50%)")
-    plt.xlabel("categories")
-    plt.ylabel("number of people")
-    plt.savefig("results/most_purchased_categories_over_median_bar.png")
+        fig2 = plt.figure(figsize=(10, 8))
+        plt.bar(labels, counts)
+        plt.xlabel("categories")
+        plt.ylabel("number of people")
+        set_title("most purchased category")
+        plt.savefig(f"results/{graph}/most_purchased_categories_{args.relation_with_median}_median_{graph}.png")
 
 
-def plot_web_purchase_under_median_bar():
-    categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
-    purchase = df[df["WebRatio"] < df["WebRatio"].describe().at["50%"]][categories]
-    purchase_sum = dict()
-    for column in categories:
-        purchase_sum[column_name_to_category[column]] = purchase[column].sum()
-    purchase_sum = dict(sorted(purchase_sum.items()))
-    labels, counts = zip(*purchase_sum.items())
+def main(args):
+    df = pd.read_csv("data/marketing_data_preprocess.csv")
+    
+    if args.plot == "histogram":
+        plot_hist(df)
 
-    fig1 = plt.figure(figsize=(8, 6))
-    plt.bar(labels, counts)
-    plt.title("purchase (web ratio < 50%)")
-    plt.xlabel("categories")
-    plt.ylabel("the sum of consumption")
-    plt.savefig("results/web_purchase_under_median_bar.png")
+    if args.plot == "pairplot":
+        pair_plot(df)
+    
+    if args.plot == "heatmap":
+        plot_heatmap(df)
 
-    categories_over_median = df[df["WebRatio"] < df["WebRatio"].describe().at["50%"]]["most_purchased"]
-    counter = Counter(categories_over_median)
-    labels, counts = zip(*counter.items())
+    if args.plot == "classification_metrics":
+        metrics = ["precision", "recall", "accuracy", "f1"]
+        for metric in metrics:
+            plot_cls_res(metric)
 
-    fig2 = plt.figure(figsize=(8, 6))
-    plt.bar(labels, counts)
-    plt.title("most purchased categories (web ratio < 50%)")
-    plt.xlabel("categories")
-    plt.ylabel("number of people")
-    plt.savefig("results/most_purchased_categories_under_median_bar.png")
-
-
-def plot_web_purchase_bar():
-    categories = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
-    purchase = df[categories]
-    purchase_sum = dict()
-    for column in categories:
-        purchase_sum[column_name_to_category[column]] = purchase[column].sum()
-    purchase_sum = Counter(purchase_sum)
-    labels, counts = zip(*purchase_sum.items())
-
-    fig1 = plt.figure(figsize=(8, 6))
-    plt.bar(labels, counts)
-    plt.title("purchase")
-    plt.xlabel("categories")
-    plt.ylabel("the sum of consumption")
-    plt.savefig("results/web_purchase__bar.png")
-
-    categories_over_median = df["most_purchased"]
-    counter = Counter(categories_over_median)
-    labels, counts = zip(*counter.items())
-
-    fig2 = plt.figure(figsize=(8, 6))
-    plt.bar(labels, counts)
-    plt.title("most purchased categories")
-    plt.xlabel("categories")
-    plt.ylabel("number of people")
-    plt.savefig("results/most_purchased_categories_bar.png")
-
-
-def plot_web_purchase_all():
-    plot_web_purchase_over_median_pie()
-    plot_web_purchase_under_median_pie()
-    plot_web_purchase_pie()
-    plot_web_purchase_over_median_bar()
-    plot_web_purchase_under_median_bar()
-    plot_web_purchase_bar()
+    if args.plot == "web_purchase":
+        plot_web_purchase_over_median_pie(df, args)
 
 
 if __name__ == "__main__":
-    df = pd.read_csv("data/marketing_data_preprocess.csv")
-    # print(df.columns)
+    parser = argparse.ArgumentParser(description="visualization.py")
+    parser.add_argument(
+        "--plot", type=str, choices=["histogram", "pairplot", "heatmap", "classification_metrics", "web_purchase"]
+    )
+    parser.add_argument(
+        "--relation_with_median", type=str, choices=["over", "under", "whole"]
+    )
+    parser.add_argument(
+        "--graph", type=str, choices=["pie", "bar"]
+    )
 
-    """
-    Index(['Unnamed: 0', 'Year_Birth', 'Education', 'ages', 'Marital_Status',
-       'Graduation', 'PhD', 'Basic', '2n Cycle', 'Master', 'Income', 'single',
-       'married', 'Kidhome', 'Teenhome', 'Dt_Customer', 'Recency', 'MntWines',
-       'months', 'MntFruits', 'MntMeatProducts', 'MntFishProducts',
-       'MntSweetProducts', 'MntGoldProds', 'NumDealsPurchases',
-       'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases',
-       'NumWebVisitsMonth', 'AcceptedCmp3', 'AcceptedCmp4', 'AcceptedCmp5',
-       'AcceptedCmp1', 'AcceptedCmp2', 'Complain', 'Z_CostContact',
-       'Z_Revenue', 'Response', 'Total_Spent', 'Total_Spent_Per_Month',
-       'Childbin', 'Kidbin', 'Teenbin', 'NwpPerVM', 'NwpPerV', 'NumPurchases',
-       'WebRatio'],
-      dtype='object')
-    """
-    selected_columns = [
-        "ages", 
-        "Education", 
-        "Income", 
-        "months", 
-        "Recency", 
-        "MntWines", 
-        "MntFruits", 
-        "MntMeatProducts", 
-        "MntFishProducts", 
-        "MntSweetProducts",
-        "MntGoldProds",
-        "NumDealsPurchases",
-        "NumWebPurchases",
-        "NumCatalogPurchases",
-        "NumStorePurchases",
-        "NumWebVisitsMonth",
-        "NwpPerV",
-        "Total_Spent", 
-        "Total_Spent_Per_Month", 
-        "Childbin", 
-        "Kidbin", 
-        "Teenbin",
-        "WebRatio"
-    ]
-
-    selected_columns_heatmap = [
-        "ages",  
-        "Income", 
-        "months", 
-        "Recency", 
-        "MntWines", 
-        "MntFruits", 
-        "MntMeatProducts", 
-        "MntFishProducts", 
-        "MntSweetProducts",
-        "MntGoldProds",
-        "NumDealsPurchases",
-        "NumWebPurchases",
-        "NumCatalogPurchases",
-        "NumStorePurchases",
-        "NumWebVisitsMonth",
-        "NwpPerV",
-        "Total_Spent", 
-        "Total_Spent_Per_Month", 
-        "Childbin", 
-        "Kidbin", 
-        "Teenbin",
-        "WebRatio"
-    ]
-    
-    # plot_hist(selected_columns)
-    # pair_plot(selected_columns)
-    # heatmap(selected_columns_heatmap)
-
-    metrics = ["precision", "recall", "accuracy", "f1"]
-    for metric in metrics:
-        plot_cls_res(metric)
-
-    plot_web_purchase_all()
+    args = parser.parse_args()
+    main(args)

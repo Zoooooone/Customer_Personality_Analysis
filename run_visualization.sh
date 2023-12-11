@@ -1,0 +1,6 @@
+python ./src/visualization.py --plot="web_purchase" --relation_with_median="over" --graph="pie"
+python ./src/visualization.py --plot="web_purchase" --relation_with_median="under" --graph="pie"
+python ./src/visualization.py --plot="web_purchase" --relation_with_median="whole" --graph="pie"
+python ./src/visualization.py --plot="web_purchase" --relation_with_median="over" --graph="bar"
+python ./src/visualization.py --plot="web_purchase" --relation_with_median="under" --graph="bar"
+python ./src/visualization.py --plot="web_purchase" --relation_with_median="whole" --graph="bar"
