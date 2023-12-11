@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 from lightgbm import LGBMClassifier
-sys.path.append("src/")
+sys.path.append("src/models")
 from cls_model_test import cross_validation
 from collections import defaultdict
 

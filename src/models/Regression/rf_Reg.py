@@ -2,7 +2,7 @@
 import sys
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-sys.path.append("src/")
+sys.path.append("src/models/")
 from reg_model_test import grid_search
 
 df = pd.read_csv("data/marketing_data_preprocess.csv")
