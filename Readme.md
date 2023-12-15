@@ -1,5 +1,8 @@
 # Customer Personality Analysis
 
+[![Static Badge](https://img.shields.io/badge/kaggle-royalblue?link=https%3A%2F%2Fwww.kaggle.com%2Fdatasets%2Fimakash3011%2Fcustomer-personality-analysis)](https://www.kaggle.com/datasets/imakash3011/customer-personality-analysis) &ensp; ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/Zoooooone/Customer_Personality_Analysis/master) &ensp; ![GitHub repo size](https://img.shields.io/github/repo-size/Zoooooone/Customer_Personality_Analysis) &ensp; ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability-percentage/Zoooooone/Customer_Personality_Analysis) &ensp; ![GitHub issues](https://img.shields.io/github/issues/Zoooooone/Customer_Personality_Analysis)
+
+
 ## Introduction
 This project is about the data analysis of [Customer Personality Analysis](https://www.kaggle.com/datasets/imakash3011/customer-personality-analysis) on **kaggle**.
 
