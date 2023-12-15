@@ -142,7 +142,21 @@ def plot_cls_res(metric):
     plt.xlabel("thresholds")
     plt.ylabel(metric)
     plt.legend()
-    plt.savefig(f"results/{metric}.png")
+    plt.savefig(f"results/classification_metrics/{metric}.png")
+
+
+def plot_reg_res(metric):
+    data = pd.read_csv("results/regression_res.csv")
+    categories = ["random forest", "lgbm", "xgboost"]
+    x = np.arange(3)
+    y = data[metric]
+
+    fig = plt.figure(figsize=(8, 6))
+    plt.bar(x, y, width=0.5)
+    plt.xticks(x, categories)
+    plt.xlabel("models")
+    plt.ylabel(metric)
+    plt.savefig(f"results/regression_metrics/{metric}.png")
 
 
 def plot_web_purchase_over_median_pie(df, args):
@@ -240,6 +254,11 @@ def main(args):
         for metric in metrics:
             plot_cls_res(metric)
 
+    if args.plot == "regression_metrics":
+        metrics = ["r2", "mse", "rmse"]
+        for metric in metrics:
+            plot_reg_res(metric)
+
     if args.plot == "web_purchase":
         plot_web_purchase_over_median_pie(df, args)
 
@@ -247,7 +266,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="visualization.py")
     parser.add_argument(
-        "--plot", type=str, choices=["histogram", "pairplot", "heatmap", "classification_metrics", "web_purchase"]
+        "--plot", type=str, choices=["histogram", "pairplot", "heatmap", "classification_metrics", "regression_metrics", "web_purchase"]
     )
     parser.add_argument(
         "--relation_with_median", type=str, choices=["over", "under", "whole"]

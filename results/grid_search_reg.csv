@@ -1,0 +1,6 @@
+,model,best_params,r2,mse
+0,random forest,"{'min_samples_split': 3, 'n_estimators': 1000}",0.8609490731866187,0.0020175106988032285
+0,lgbm,"{'learning_rate': 0.05, 'n_estimators': 500}",0.769097674523794,0.0035651278212198347
+0,xgboost,"{'learning_rate': 0.1, 'n_estimators': 500}",0.8717476038381395,0.0017361987260551331
+0,knn,"{'leaf_size': 20, 'n_neighbors': 6, 'weights': 'distance'}",0.25567051508352223,0.009285980950719197
+0,svm,"{'C': 10, 'kernel': 'rbf'}",0.08280093287349577,0.011714013867883627
