@@ -11,13 +11,13 @@ This project is about the data analysis of [Customer Personality Analysis](https
 ├───img
 ├───results
 │   ├───bar
-│   └───pie
+│   ├───classification_metrics
+│   ├───pie
+│   └───regression_metrics
 └───src
     │   preprocess.py
     │   visualization.py
     └───models
-        ├───Classification
-        └───Regression
 ```
 
 This represents the directory structure of the project, providing specific details:
@@ -52,6 +52,11 @@ You can execute the visualization code using the following commands:
 - evaluation metrics for classification models
     ```
     python ./src/visualization.py --plot="classification_metrics"
+    ```
+
+- evaluation metrics for regression models
+    ```
+    python ./src/visualization.py --plot="regression_metrics"
     ```
 
 - the visualization of data analysis results
